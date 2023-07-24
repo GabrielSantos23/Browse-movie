@@ -7,7 +7,7 @@ import axios from 'axios';
 import './Banner.css';
 import { faPlay, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
-import useLoading from '../hooks/loaders/HomeLoader';
+import useLoading from '@/hooks/HomeLoader';
 import { enUS } from 'date-fns/locale';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 interface BannerProps {
@@ -170,12 +170,12 @@ const Banner: React.FC<BannerProps> = ({ urltype }) => {
                 <p className='line-clamp-2 md:w-4/5 mt-5 '>{movie.overview}</p>
               </div>
               <div className='mt-10 flex gap-5 '>
-                <button className='bg-[#DC1623] py-2 rounded-md px-3'>
+                <button className='bg-[#DC1623] py-2 border-none rounded-md px-3'>
                   {' '}
                   <FontAwesomeIcon icon={faPlay} width={25} />
                   Watch Now
                 </button>
-                <button className='bg-white text-black rounded-md py-2 px-3'>
+                <button className='bg-white text-black rounded-md border-none py-2 px-3'>
                   <FontAwesomeIcon icon={faPlus} width={25} />
                   Add
                 </button>

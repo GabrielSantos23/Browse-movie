@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { usePathname } from 'next/navigation'; // Corrected import statement
 import { SidebarItems } from '@/app/data/SidebarData';
 import Link from 'next/link';
-import useLoading from '../hooks/loaders/HomeLoader';
+import useLoading from '@/hooks/HomeLoader';
 
 const MobileMenu = () => {
   const pathname = usePathname();
