@@ -8,14 +8,20 @@ export default function Home() {
     <div className='mt-14'>
       <Banner urltype={'trending/all/week?'} />
       <div className='mt-10'>
+        <TrendList
+          urltype='trending/all/week?'
+          title='Top 10 For the Week'
+          type={'movie'}
+          explore
+        />
         <List
-          urltype='movie/popular'
+          urltype='trending/movie/week?'
           title='Popular Movies'
           type={'movie'}
           explore
         />
         <List
-          urltype={'trending/tv/week'}
+          urltype={'trending/tv/week?'}
           title='Trending Series'
           type={'tv'}
           explore

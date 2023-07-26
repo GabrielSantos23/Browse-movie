@@ -36,7 +36,13 @@ interface ItemProps {
   userImage?: boolean;
 }
 
-const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
+const PosterItem: React.FC<ItemProps> = ({
+  item,
+  type,
+  person,
+  url,
+  userImage,
+}) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +52,6 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
   const { supabaseClient } = useSessionContext();
   const { user } = useUser();
   const router = useRouter();
-  const [Backdrop, setBackdrop] = useState<any>([]);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -150,26 +155,7 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
     }
     return '';
   };
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-
-  useEffect(() => {
-    const getMoviePhotos = async () => {
-      const response = await axios.get(
-        `https://api.themoviedb.org/3/${type}/${item.id}/images?api_key=${apiKey}`
-      );
-
-      const backdropsEn = response.data.backdrops.filter(
-        (backdrop: any) => backdrop.iso_639_1 === 'en'
-      );
-
-      // Return only the first backdrop, or an empty object if there are no backdrops
-      const firstBackdrop = backdropsEn.length > 0 ? backdropsEn[0] : {};
-
-      setBackdrop(firstBackdrop);
-    };
-
-    getMoviePhotos();
-  }, [item.id]);
+  console.log(item);
 
   return (
     <div className='flex flex-col'>
@@ -183,13 +169,11 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
           >
             <LazyLoadImage
               className={` 
-              rounded-lg shadow-md md:min-h-[190px] min-h-[250px]
+              rounded-lg shadow-md md:max-h-[320px] min-h-[320px] min-w-[190px]
               `}
               src={
-                Backdrop.file_path
-                  ? `https://image.tmdb.org/t/p/original${Backdrop.file_path}`
-                  : item.backdrop_path
-                  ? `https://image.tmdb.org/t/p/original${item.backdrop_path}`
+                item.poster_path
+                  ? `https://image.tmdb.org/t/p/original${item.poster_path}`
                   : '/assets/placeholderwide.png'
               }
               alt={item.title || item.name}
@@ -205,7 +189,9 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
         </Link>
       </div>
       <div className=' mt-5  '>
-        <p className='truncate font-semibold'>{item.title || item.name}</p>
+        <p className='truncate max-w-[190px] font-semibold'>
+          {item.title || item.name}
+        </p>
         <div className='flex justify-between mt-2'>
           <p className='text-sm text-custom-dark-gray'>{genre}</p>
           <div className='flex gap-3'>
@@ -230,4 +216,4 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
   );
 };
 
-export default Item;
+export default PosterItem;

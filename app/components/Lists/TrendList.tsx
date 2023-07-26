@@ -10,6 +10,8 @@ const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 import { BiSolidMovie, BiTv } from 'react-icons/bi';
 import { AiOutlinePlus } from 'react-icons/ai';
 import Button3 from '../Buttons/Button3';
+import useLoading from '@/hooks/HomeLoader';
+import PosterItem from '../Items/PosterItem';
 interface Genre {
   id: number;
   name: string;
@@ -21,6 +23,7 @@ interface ItemsCarouselProps {
   title?: string;
   url?: string;
   serie?: boolean;
+  type?: string;
 }
 
 const TrendList: React.FC<ItemsCarouselProps> = ({
@@ -29,163 +32,65 @@ const TrendList: React.FC<ItemsCarouselProps> = ({
   title,
   url,
   serie,
+  type,
 }) => {
   const [items, setItems] = useState<any[]>([]);
-  const [trendingType, setTrendingType] = useState('trending/all/week');
-  const [genres, setGenres] = useState<Genre[]>([]); // Estado para armazenar a lista de gêneros
-  const [selectedGenre, setSelectedGenre] = useState<number | null>(null); // Estado para armazenar o gênero selecionado
-
-  const categoryButtons = [
-    {
-      type: 'trending/all/week',
-      icon: <HiArrowTrendingUp />,
-      label: 'Trending',
-    },
-    {
-      type: 'trending/tv/week',
-      icon: <BiTv />,
-      label: 'TV',
-    },
-    {
-      type: 'trending/movie/week',
-      icon: <BiSolidMovie />,
-      label: 'Movies',
-    },
-    {
-      type: 'movie/upcoming',
-      icon: <AiOutlinePlus />,
-      label: 'Upcoming',
-    },
-  ];
+  const { isLoading, setLoading } = useLoading();
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
-        `https://api.themoviedb.org/3/${trendingType}`,
+        `https://api.themoviedb.org/3/${urltype}`,
         {
           params: {
             api_key: apiKey,
           },
         }
       );
-
-      setItems(response?.data?.results || []);
+      {
+        response?.data?.results
+          ? setItems(response?.data?.results)
+          : setItems(response?.data?.cast);
+      }
     };
 
     fetchData();
-  }, [trendingType]);
+  }, []);
 
-  useEffect(() => {
-    const fetchGenres = async () => {
-      const trend =
-        trendingType === 'treding/all/week'
-          ? 'all'
-          : trendingType === 'trending/movie/week'
-          ? 'movie'
-          : trendingType === 'trending/tv/week'
-          ? 'tv'
-          : 'upcoming';
-      const response = await axios.get(
-        `https://api.themoviedb.org/3/genre/${trend}/list`,
-        {
-          params: {
-            api_key: apiKey,
-          },
-        }
-      );
-
-      setGenres(response?.data?.genres || []);
-    };
-
-    fetchGenres();
-  }, [trendingType]);
-
-  const handleGenreChange = (genreId: number) => {
-    setSelectedGenre(genreId);
-  };
-
-  const filteredItems = selectedGenre
-    ? items.filter((item) => item.genre_ids.includes(selectedGenre))
-    : items;
-
-  const filteredGenres = genres.filter((genre) => {
-    const itemCount = items.filter((item) =>
-      item.genre_ids.includes(genre.id)
-    ).length;
-    return itemCount > 5;
-  });
-
-  console.log(items);
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <>
-      {items.length !== 0 && (
-        <div
-          className={`py-5 
-        `}
-        >
-          <div className='md:px-32 px-3 overflow-auto mb-12'>
-            <div className='flex gap-2 pb-5   justify-between  border-b-[#2C2B33] border-b '>
-              {categoryButtons.map((button) => (
-                <button
-                  key={button.type}
-                  className={`${
-                    trendingType === button.type
-                      ? 'text-2xl '
-                      : 'text-base text-gray-400'
-                  } py-2 px-4 rounded items-center flex flex-col gap-3 transition duration-300`}
-                  onClick={() => setTrendingType(button.type)}
-                >
-                  <div className='flex gap-2 items-center'>
-                    {button.icon} {button.label}
-                  </div>
-                  {trendingType === button.type && (
-                    <div className='h-2 w-2 bg-red-500 ml-7 rounded-full'></div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className='md:px-32 px-3 overflow-auto'>
-            {filteredGenres.length > 0 && (
-              <div className='flex gap-2 mb-4'>
-                <Button3
-                  // className={`${
-                  //   selectedGenre === null ? 'bg-sky-500' : 'bg-gray-500'
-                  // } py-2 px-4 rounded`}
-                  onClick={() => handleGenreChange(null)}
-                  selected={selectedGenre === null ? true : false}
-                >
-                  All Genres
-                </Button3>
-                {filteredGenres.map((genre) => (
-                  <Button3
-                    selected={selectedGenre === genre.id ? true : false}
-                    key={genre.id}
-                    onClick={() => handleGenreChange(genre.id)}
-                  >
-                    {genre.name}
-                  </Button3>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className='  '>
-            <Carousel>
-              {filteredItems.map((item) => (
-                <Item
-                  key={item.id}
-                  item={item}
-                  type={item.title ? 'movie' : 'tv'}
-                  url={url}
-                />
-              ))}
-            </Carousel>
-          </div>
+      <div className='flex flex-col'>
+        <div className='flex justify-between items-center mb-8 md-5'>
+          <h1 className='text-3xl font-bold'>{title}</h1>
+          {explore && <p className='text-custom-dark-gray'>View all</p>}
         </div>
-      )}
+        <div className=''>
+          <Carousel>
+            {items.slice(0, 10).map((item, index) => {
+              const lastIndex = 9; // Último índice do slice (0 a 10 = 11 itens, mas o índice 9 é o último)
+
+              return (
+                <div key={index} className='flex items-center'>
+                  <h1
+                    className={`md:flex hidden h1test text-[200px] cursor-default font-bold z-[-1] ${
+                      index > 0 ? '-mr-8' : '' // Aplica -mr-8 em todos, exceto no primeiro
+                    } ${index === lastIndex ? '-mr-24' : ''}`} // Aplica -mr-16 apenas no último índice
+                  >
+                    {index + 1}
+                  </h1>
+                  <div className='z-[1]'>
+                    <PosterItem item={item} type={type} url={url} />
+                  </div>
+                </div>
+              );
+            })}
+          </Carousel>
+        </div>
+      </div>
     </>
   );
 };

@@ -12,9 +12,10 @@ body,
   scroll-behavior: smooth !important;
 }
 
-@font-face {
-  font-family: 'Rubik';
-  src: '../public/fonts/SFPRODISPLAYREGULAR.otf';
-  font-weight: normal;
-  font-style: normal;
+.h1test {
+  color: #5f5f5f;
+  -webkit-text-fill-color: #080808; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: #5f5f5f;
+  opacity: 50%;
 }
