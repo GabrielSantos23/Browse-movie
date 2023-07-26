@@ -6,8 +6,15 @@ html,
 body,
 :root {
   height: 100%;
-  background-color: #16151a;
+  background-color: #080808;
   color-scheme: dark;
   --scroll-behavior: smooth !important;
   scroll-behavior: smooth !important;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: '../public/fonts/SFPRODISPLAYREGULAR.otf';
+  font-weight: normal;
+  font-style: normal;
 }

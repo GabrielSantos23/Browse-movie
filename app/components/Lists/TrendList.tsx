@@ -35,6 +35,29 @@ const TrendList: React.FC<ItemsCarouselProps> = ({
   const [genres, setGenres] = useState<Genre[]>([]); // Estado para armazenar a lista de gêneros
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null); // Estado para armazenar o gênero selecionado
 
+  const categoryButtons = [
+    {
+      type: 'trending/all/week',
+      icon: <HiArrowTrendingUp />,
+      label: 'Trending',
+    },
+    {
+      type: 'trending/tv/week',
+      icon: <BiTv />,
+      label: 'TV',
+    },
+    {
+      type: 'trending/movie/week',
+      icon: <BiSolidMovie />,
+      label: 'Movies',
+    },
+    {
+      type: 'movie/upcoming',
+      icon: <AiOutlinePlus />,
+      label: 'Upcoming',
+    },
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
@@ -103,64 +126,24 @@ const TrendList: React.FC<ItemsCarouselProps> = ({
         >
           <div className='md:px-32 px-3 overflow-auto mb-12'>
             <div className='flex gap-2 pb-5   justify-between  border-b-[#2C2B33] border-b '>
-              <button
-                className={`${
-                  trendingType === 'trending/all/week'
-                    ? 'text-xl '
-                    : 'text-base'
-                }  py-2 px-4 rounded items-center flex flex-col gap-3 transition duration-300`}
-                onClick={() => setTrendingType('trending/all/week')}
-              >
-                <div className='flex gap-2 items-center'>
-                  <HiArrowTrendingUp /> Trending
-                </div>
-                {trendingType === 'trending/all/week' && (
-                  <div className='h-2 w-2 ml-7 bg-red-500 rounded-full'></div>
-                )}
-              </button>
-              <button
-                className={`${
-                  trendingType === 'trending/tv/week'
-                    ? 'text-2xl '
-                    : 'text-base'
-                }  py-2 px-4 rounded items-center flex flex-col gap-3 transition duration-300`}
-                onClick={() => setTrendingType('trending/tv/week')}
-              >
-                <div className='flex gap-2 items-center'>
-                  <BiTv /> TV
-                </div>
-                {trendingType === 'trending/tv/week' && (
-                  <div className='h-2 w-2 bg-red-500 ml-7 rounded-full'></div>
-                )}
-              </button>
-              <button
-                className={`${
-                  trendingType === 'trending/movie/week'
-                    ? 'text-2xl '
-                    : 'text-base'
-                }  py-2 px-4 rounded items-center flex flex-col gap-3 transition duration-300`}
-                onClick={() => setTrendingType('trending/movie/week')}
-              >
-                <div className='flex gap-2 items-center'>
-                  <BiSolidMovie /> Movies
-                </div>
-                {trendingType === 'trending/movie/week' && (
-                  <div className='h-2 w-2 bg-red-500 ml-7 rounded-full'></div>
-                )}
-              </button>
-              <button
-                className={`${
-                  trendingType === 'movie/upcoming' ? 'text-2xl ' : 'text-base'
-                }  py-2 px-4 rounded items-center flex flex-col gap-3 transition duration-300`}
-                onClick={() => setTrendingType('movie/upcoming')}
-              >
-                <div className='flex gap-2 items-center'>
-                  <AiOutlinePlus /> Upcoming
-                </div>
-                {trendingType === 'movie/upcoming' && (
-                  <div className='h-2 w-2  rounded-full'></div>
-                )}
-              </button>
+              {categoryButtons.map((button) => (
+                <button
+                  key={button.type}
+                  className={`${
+                    trendingType === button.type
+                      ? 'text-2xl '
+                      : 'text-base text-gray-400'
+                  } py-2 px-4 rounded items-center flex flex-col gap-3 transition duration-300`}
+                  onClick={() => setTrendingType(button.type)}
+                >
+                  <div className='flex gap-2 items-center'>
+                    {button.icon} {button.label}
+                  </div>
+                  {trendingType === button.type && (
+                    <div className='h-2 w-2 bg-red-500 ml-7 rounded-full'></div>
+                  )}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -180,9 +163,6 @@ const TrendList: React.FC<ItemsCarouselProps> = ({
                   <Button3
                     selected={selectedGenre === genre.id ? true : false}
                     key={genre.id}
-                    className={`${
-                      selectedGenre === genre.id ? 'bg-sky-500' : 'bg-gray-500'
-                    } py-2 px-4 rounded`}
                     onClick={() => handleGenreChange(genre.id)}
                   >
                     {genre.name}
@@ -192,7 +172,7 @@ const TrendList: React.FC<ItemsCarouselProps> = ({
             )}
           </div>
 
-          <div>
+          <div className='  '>
             <Carousel>
               {filteredItems.map((item) => (
                 <Item

@@ -56,7 +56,7 @@ const SwiperArrowRight: React.FC<SwiperArrowProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ children }) => {
   const swiperOptions = {
     slidesPerView: 7.15,
-    spaceBetween: 3,
+    spaceBetween: 13,
     initialSlide: 0,
     autoplay: false,
     loop: false,
@@ -67,7 +67,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
     },
     breakpoints: {
       1600: {
-        slidesPerView: 7.15,
+        slidesPerView: 5,
         slidesPerGroup: 4,
       },
       1300: {
@@ -84,39 +84,16 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
         initialSlide: 2,
       },
       250: {
-        slidesPerView: 1,
+        slidesPerView: 2,
         slidesPerGroup: 1,
       },
     },
   };
 
-  const StyledSwiper = styled(Swiper)`
-    .swiper-button-prev {
-      height: 370px;
-      top: 0;
-      left: 0;
-      background-color: #00000090;
-      border: none;
-      color: white;
-      font-size: 10px;
-      width: 30px;
-    }
-    .swiper-button-next {
-      height: 370px;
-      top: 0;
-      right: 0;
-      background-color: #00000090;
-      border: none;
-      color: white;
-      font-size: 10px;
-      width: 30px;
-    }
-  `;
-
   return (
     <StyledSwiper {...swiperOptions}>
       {React.Children.map(children, (child) => (
-        <SwiperSlide key={child.key} className='card-home'>
+        <SwiperSlide key={child.key} className='card-home '>
           {child}
         </SwiperSlide>
       ))}
@@ -127,3 +104,26 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
 };
 
 export default Carousel;
+
+const StyledSwiper = styled(Swiper)`
+  .swiper-button-prev {
+    height: 90%;
+    top: 0;
+    left: 0;
+    background-color: #00000090;
+    border: none;
+    color: white;
+    font-size: 10px;
+    width: 30px;
+  }
+  .swiper-button-next {
+    height: 90%;
+    top: 0;
+    right: 0;
+    background-color: #00000090;
+    border: none;
+    color: white;
+    font-size: 10px;
+    width: 30px;
+  }
+`;

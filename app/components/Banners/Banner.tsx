@@ -10,9 +10,15 @@ import { format } from 'date-fns';
 import useLoading from '@/hooks/HomeLoader';
 import { enUS } from 'date-fns/locale';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Button3 from '../Buttons/Button3';
 interface BannerProps {
   urltype: string;
 }
+interface Genre {
+  id: number;
+  name: string;
+}
+
 const Banner: React.FC<BannerProps> = ({ urltype }) => {
   const [showImage, setShowImage] = useState(false);
   const [movie, setMovie] = useState<any>({});
@@ -24,8 +30,7 @@ const Banner: React.FC<BannerProps> = ({ urltype }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { isLoading, setLoading } = useLoading();
   const [genres, setGenres] = useState([]);
-  const [genreNames, setGenreNames] = useState([]);
-  console.log(movie);
+  const [genreNames, setGenreNames] = useState<Genre[]>([]);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -57,11 +62,6 @@ const Banner: React.FC<BannerProps> = ({ urltype }) => {
         setGenreNames(genreList);
       });
   }, [apiKey, urltype]);
-
-  const getGenreName = (genreId: any) => {
-    const genre = genreNames.find((genre) => genre.id === genreId);
-    return genre && genre.name;
-  };
 
   useEffect(() => {
     if (movie && movie.id) {
@@ -118,72 +118,83 @@ const Banner: React.FC<BannerProps> = ({ urltype }) => {
     return null;
   }
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) {
-      return '';
+  const formatVoteAverage = (
+    voteAverage: number | undefined | null
+  ): string => {
+    if (voteAverage !== undefined && voteAverage !== null) {
+      return voteAverage.toFixed(1);
     }
-
-    const date = new Date(dateString);
-    return format(date, 'dd MMMM yyyy', { locale: enUS });
+    return '';
   };
 
-  return (
-    <div>
-      <div className='w-full h-[70vh] bg-black'>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: imageLoaded ? 1 : 0 }}
-          transition={{ duration: 0.5, type: 'linear' }}
-          className='flex-end  right-0 flex h-[70vh] md:w-[70%]  '
-        >
-          <LazyLoadImage
-            className='absolute top-0 h-[70vh] w-screen object-cover opacity-70'
-            src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
-            alt={movie?.name || movie?.title}
-            threshold={0}
-            effect='opacity'
-            afterLoad={handleImageLoad}
-          />
-          <div className='md:bg-gradient-to-r bg-gradient-to-t from-black relative   w-full items-center justify-center   h-full  '>
-            <div className='w-full flex   flex-col  md:px-32  justify-center  px-10 h-full  '>
-              <div className='flex flex-col justify-center'>
-                <h1 className='text-4xl line-clamp-2  font-bold'>
-                  {movie?.name || movie?.title}
-                </h1>
-                <div className='flex gap-1 text-gray-400 flex-wrap'>
-                  <p>
-                    {genres
-                      .map((genreId) => getGenreName(genreId))
-                      .filter((genreName) => genreName)
-                      .join(', ')}
-                  </p>
-                  <p>
-                    {movie &&
-                      `${movie.release_date && '|'} ${formatDate(
-                        movie.release_date
-                      )}`}
-                  </p>
-                </div>
-              </div>
+  const getYearFromReleaseDate = (releaseDate: string | null | undefined) => {
+    if (releaseDate) {
+      const parts = releaseDate.split('-');
+      return parts[0];
+    }
+    return '';
+  };
 
-              <div>
-                <p className='line-clamp-2 md:w-4/5 mt-5 '>{movie.overview}</p>
-              </div>
-              <div className='mt-10 flex gap-5 '>
-                <button className='bg-[#DC1623] py-2 border-none rounded-md px-3'>
-                  {' '}
-                  <FontAwesomeIcon icon={faPlay} width={25} />
-                  Watch Now
-                </button>
-                <button className='bg-white text-black rounded-md border-none py-2 px-3'>
-                  <FontAwesomeIcon icon={faPlus} width={25} />
-                  Add
-                </button>
+  const getGenreName = (genreId: number) => {
+    const genre = genreNames.find(
+      (genre: { id: number }) => genre.id === genreId
+    );
+    return genre ? genre.name : '';
+  };
+  const firstGenre = genreNames.length > 0 ? getGenreName(genres[0]) : '';
+
+  return (
+    <div className='w-full h-[70vh]  rounded-md relative bg-black'>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: imageLoaded ? 1 : 0 }}
+        transition={{ duration: 0.5, type: 'linear' }}
+        className='flex-end  right-0 flex h-[70vh] md:w-[70%] rounded-md '
+      >
+        <LazyLoadImage
+          className='absolute  h-[70vh] w-screen object-cover opacity-50 rounded-md'
+          src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
+          alt={movie?.name || movie?.title}
+          threshold={0}
+          effect='opacity'
+          afterLoad={handleImageLoad}
+        />
+        <div className=' relative  rounded-md  w-full items-center justify-center   h-full  '>
+          <div className='w-full flex   flex-col  md:px-32  justify-center  px-10 h-full  '>
+            <div className='flex flex-col justify-center'>
+              <h1 className='md:text-6xl text-4xl line-clamp-2  font-bold'>
+                {movie?.name || movie?.title}
+              </h1>
+              <div className='flex gap-5 text-custom-gray flex-wrap'>
+                {movie.vote_average !== undefined &&
+                  movie.vote_average !== null && (
+                    <p>{formatVoteAverage(movie.vote_average)}/10</p>
+                  )}
+
+                <p>
+                  {movie.release_date
+                    ? `${getYearFromReleaseDate(movie.release_date)}`
+                    : `${getYearFromReleaseDate(movie.first_air_date)}`}
+                </p>
+                <p>{movie.name ? 'TV Series' : 'Movie'}</p>
+                {firstGenre && <p>{firstGenre}</p>}
               </div>
             </div>
+
+            <div>
+              <p className='line-clamp-4 md:w-3/5 mt-5 '>{movie.overview}</p>
+            </div>
+            <div className='mt-10 flex gap-5 '>
+              <Button3 onClick={() => {}} primary>
+                Play
+              </Button3>
+              <Button3 onClick={() => {}} primary={false}>
+                Add Waitlist
+              </Button3>
+            </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

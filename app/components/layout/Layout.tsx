@@ -10,7 +10,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className=''>
       <Sidebar />
-      <div className=''>{children}</div>
+      <div className='md:py-6  md:px-16'>{children}</div>
       <MobileMenu />
     </div>
   );

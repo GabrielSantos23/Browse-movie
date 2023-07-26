@@ -22,7 +22,7 @@ const MobileMenu = () => {
   }
 
   return (
-    <div className='md:hidden bg-[#1E1D22] transition duration-200  fixed bottom-0 w-full  block '>
+    <div className='md:hidden bg-[#1E1D22] transition duration-200  fixed bottom-0 w-full z-[9999999]  block '>
       <div className='flex items-center p-5   '>
         {SidebarItems.map((item, index) => {
           const isActive = pathname === item.path;

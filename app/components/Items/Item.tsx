@@ -1,5 +1,6 @@
 'use client';
 
+import axios from 'axios';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import './ItemStyle.css';
@@ -14,16 +15,20 @@ import { useSessionContext } from '@supabase/auth-helpers-react';
 import { useUser } from '@/hooks/useUser';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { AiFillHeart, AiFillEye } from 'react-icons/ai';
 
 interface ItemProps {
   item: {
     id?: number | string | undefined;
     poster_path?: string | undefined;
+    backdrop_path?: string | undefined;
     title?: string | undefined;
     name?: string | undefined;
     vote_average?: number | null | undefined;
     character?: string;
     profile_path?: string | undefined;
+    release_date?: string | null | undefined;
+    first_air_date?: string | null | undefined;
   };
   type?: string | null;
   person?: boolean;
@@ -31,22 +36,17 @@ interface ItemProps {
   userImage?: boolean;
 }
 
-const Item: React.FC<ItemProps> = ({
-  item,
-  type,
-  person,
-  url,
-  userImage,
-  ItemId,
-}) => {
+const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [genre, setGenre] = useState<string>('');
 
   const authModal = useAuthModal();
   const { supabaseClient } = useSessionContext();
   const { user } = useUser();
   const router = useRouter();
+  const [Backdrop, setBackdrop] = useState<any>([]);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -112,28 +112,87 @@ const Item: React.FC<ItemProps> = ({
     }
   };
 
+  useEffect(() => {
+    const fetchGenre = async () => {
+      if (!item.id || !type) return;
+
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+      const baseUrl = 'https://api.themoviedb.org/3';
+
+      try {
+        const response = await axios.get(
+          `${baseUrl}/${type}/${item.id}?api_key=${apiKey}&language=en-US`
+        );
+
+        if (response.data.genres && response.data.genres.length > 0) {
+          const firstGenreName = response.data.genres[0].name;
+          setGenre(firstGenreName);
+        } else {
+          setGenre('Genre not available');
+        }
+      } catch (error) {
+        console.error('Error fetching genre:', error);
+        setGenre('Genre not available');
+      }
+    };
+
+    fetchGenre();
+  }, [item.id, type]);
+
   const Icon = isFavorite ? BsFillBookmarkFill : BsBookmark;
+
+  const formatVoteAverage = (
+    voteAverage: number | undefined | null
+  ): string => {
+    if (voteAverage !== undefined && voteAverage !== null) {
+      return voteAverage.toFixed(1);
+    }
+    return '';
+  };
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+  useEffect(() => {
+    const getMoviePhotos = async () => {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/${type}/${item.id}/images?api_key=${apiKey}`
+      );
+
+      const backdropsEn = response.data.backdrops.filter(
+        (backdrop: any) => backdrop.iso_639_1 === 'en'
+      );
+
+      // Return only the first backdrop, or an empty object if there are no backdrops
+      const firstBackdrop = backdropsEn.length > 0 ? backdropsEn[0] : {};
+
+      setBackdrop(firstBackdrop);
+    };
+
+    getMoviePhotos();
+  }, [item.id]);
+
+  console.log(Backdrop);
 
   return (
     <div className='flex flex-col'>
-      <div className='bg-[#202124]'>
+      <div className='bg-[#202124] rounded-lg shadow-md'>
         <Link href={`/${type}/${item.id}`}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: imageLoaded ? 1 : 0 }}
             transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
-            className='relative group  group-hover:transition-all'
+            className='relative group  group-hover:transition-all gap-5 flex flex-col'
           >
             <LazyLoadImage
-              className={`Image min-h-[370px] ${
-                userImage && 'max-h-[370px] max-w-[250px] min-w-[250px]'
-              } `}
+              className={` 
+              rounded-lg shadow-md md:min-h-[190px] min-h-[250px]
+              `}
               src={
-                person && item.profile_path
-                  ? `https://image.tmdb.org/t/p/original${item.profile_path}`
-                  : item.poster_path
-                  ? `https://image.tmdb.org/t/p/original${item.poster_path}`
-                  : '/assets/placeholder.png'
+                Backdrop.file_path
+                  ? `https://image.tmdb.org/t/p/original${Backdrop.file_path}`
+                  : item.backdrop_path
+                  ? `https://image.tmdb.org/t/p/original${item.backdrop_path}`
+                  : '/assets/placeholderwide.png'
               }
               alt={item.title || item.name}
               threshold={0}
@@ -141,57 +200,34 @@ const Item: React.FC<ItemProps> = ({
               afterLoad={handleImageLoad}
               placeholderSrc='/assets/placeholder.png'
             />
-
-            {type !== 'person' && (
-              <div
-                className={`${'absolute w-full hidden  group-hover:transition-all group-hover:block h-full top-0 backdrop-blur-[4px] group-hover:bg-zinc-800/50'}  `}
-              >
-                <div className='flex items-center justify-center h-full'>
-                  <BsFillPlayFill size={40} />
-                </div>
-                <div className='flex justify-end h-full items-start w-full top-0 absolute pt-3 pr-3 '>
-                  <button onClick={(event) => handleSubmit(event)}>
-                    <Icon size={20} />
-                  </button>
-                </div>
-              </div>
-            )}
+            <p className='absolute left-2 top-2 bg-custom-red rounded-xl px-5 text-sm'>
+              {formatVoteAverage(item.vote_average)}
+            </p>
           </motion.div>
         </Link>
       </div>
-
-      <p className='line-clamp-1 max-w-[250px]'>{item.title || item.name} </p>
-      {!person && item?.vote_average !== 0 && (
-        <div className='flex gap-3 items-center'>
-          <Rating
-            precision={0.5}
-            readOnly
-            size='small'
-            sx={{
-              fontSize: '15px',
-              color: '#1d9bf0',
-              height: '20px',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-            emptyIcon={
-              <StarBorderIcon
-                fontSize='inherit'
-                style={{
-                  color: '#1d9bf0',
-                }}
+      <div className=' mt-5  '>
+        <p className='truncate font-semibold'>{item.title || item.name}</p>
+        <div className='flex justify-between mt-2'>
+          <p className='text-sm text-custom-dark-gray'>{genre}</p>
+          <div className='flex gap-3'>
+            <button onClick={(e) => handleSubmit(e)}>
+              <AiFillEye
+                className={` ${
+                  isFavorite ? 'text-red-500' : 'text-[#444347]'
+                } `}
               />
-            }
-            value={item?.vote_average ? item?.vote_average / 2 : 0}
-          />
-          <p className='text-stone-500 text-sm'>{item?.vote_average}</p>
+            </button>
+            <button onClick={(e) => handleSubmit(e)}>
+              <AiFillHeart
+                className={` ${
+                  isFavorite ? 'text-red-500' : 'text-[#444347]'
+                } `}
+              />
+            </button>
+          </div>
         </div>
-      )}
-      {person && item?.vote_average !== 0 && (
-        <>
-          <p className='text-stone-500 text-sm'>{item.character}</p>
-        </>
-      )}
+      </div>
     </div>
   );
 };

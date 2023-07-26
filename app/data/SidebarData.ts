@@ -21,12 +21,20 @@ export const SidebarItems = [
     path: '/series',
   },
   {
-    name: 'cartoons',
+    name: 'For Kids',
     path: '/cartoons',
   },
   {
-    name: 'categories',
-    path: '/categories',
+    name: 'Collection',
+    path: '/collection',
+  },
+  {
+    name: 'Catalog',
+    path: '/catalog',
+  },
+  {
+    name: 'My List',
+    path: '/MYList',
   },
   {
     name: '',

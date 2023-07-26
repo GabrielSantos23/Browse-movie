@@ -7,6 +7,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        'custom-red': '#b81d23',
+        'custom-gray': '#8c8c8c',
+        'custom-dark-gray': '#5f5f5f',
+        'custom-white': '#f5f5f1',
+      },
+      fontFamily: {
+        sans: ['var(--font-sfprodisplay)'],
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
@@ -15,4 +24,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};
