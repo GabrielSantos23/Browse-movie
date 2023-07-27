@@ -8,12 +8,6 @@ export default function Home() {
     <div className='mt-14'>
       <Banner urltype={'trending/all/week?'} />
       <div className='mt-10'>
-        <TrendList
-          urltype='trending/all/week?'
-          title='Top 10 For the Week'
-          type={'movie'}
-          explore
-        />
         <List
           urltype='trending/movie/week?'
           title='Popular Movies'
@@ -26,6 +20,12 @@ export default function Home() {
           type={'tv'}
           explore
         />
+        {/* <TrendList
+          urltype='trending/all/week?'
+          title='Top 10 For the Week'
+          type={'movie'}
+          explore
+        /> */}
       </div>
     </div>
   );

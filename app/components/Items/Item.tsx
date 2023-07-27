@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import './ItemStyle.css';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Placeholder from '@/public/assets/placeholder';
-import { Rating } from '@mui/material';
+import { Divider, Rating, Stack } from '@mui/material';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import { motion } from 'framer-motion';
 import { BsBookmark, BsFillBookmarkFill, BsFillPlayFill } from 'react-icons/bs';
@@ -16,7 +16,7 @@ import { useUser } from '@/hooks/useUser';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { AiFillHeart, AiFillEye } from 'react-icons/ai';
-
+import { Heading, Text } from '@chakra-ui/react';
 interface ItemProps {
   item: {
     id?: number | string | undefined;
@@ -41,7 +41,7 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [genre, setGenre] = useState<string>('');
-
+  const [isHovered, setIsHovered] = useState(false);
   const authModal = useAuthModal();
   const { supabaseClient } = useSessionContext();
   const { user } = useUser();
@@ -172,19 +172,25 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
   }, [item.id]);
 
   return (
-    <div className='flex flex-col'>
+    <Stack
+      className={`group  ${
+        isHovered ? 'scale-110 transition durantion-200' : ''
+      }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      // Add other styling classes as needed
+    >
       <div className='bg-[#202124] rounded-lg shadow-md'>
         <Link href={`/${type}/${item.id}`}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: imageLoaded ? 1 : 0 }}
             transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
-            className='relative group  group-hover:transition-all gap-5 flex flex-col'
+            className='relative group   gap-5 flex flex-col'
           >
+            {/* Use Chakra UI's Image component */}
             <LazyLoadImage
-              className={` 
-              rounded-lg shadow-md md:min-h-[190px] min-h-[250px]
-              `}
+              className={`rounded-t-lg  shadow-md md:min-h-[190px] min-h-[250px]`}
               src={
                 Backdrop.file_path
                   ? `https://image.tmdb.org/t/p/original${Backdrop.file_path}`
@@ -193,40 +199,26 @@ const Item: React.FC<ItemProps> = ({ item, type, person, url, userImage }) => {
                   : '/assets/placeholderwide.png'
               }
               alt={item.title || item.name}
-              threshold={0}
-              effect='opacity'
               afterLoad={handleImageLoad}
               placeholderSrc='/assets/placeholder.png'
             />
-            <p className='absolute left-2 top-2 bg-custom-red rounded-xl px-5 text-sm'>
-              {formatVoteAverage(item.vote_average)}
-            </p>
           </motion.div>
         </Link>
       </div>
-      <div className=' mt-5  '>
-        <p className='truncate font-semibold'>{item.title || item.name}</p>
-        <div className='flex justify-between mt-2'>
-          <p className='text-sm text-custom-dark-gray'>{genre}</p>
-          <div className='flex gap-3'>
-            <button onClick={(e) => handleSubmit(e)}>
-              <AiFillEye
-                className={` ${
-                  isFavorite ? 'text-red-500' : 'text-[#444347]'
-                } `}
-              />
-            </button>
-            <button onClick={(e) => handleSubmit(e)}>
-              <AiFillHeart
-                className={` ${
-                  isFavorite ? 'text-red-500' : 'text-[#444347]'
-                } `}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+
+      <Stack spacing={3} className='bg-black p-3 rounded-b-lg'>
+        {/* Use Chakra UI's Heading component */}
+        <Heading size='md'>{item.title || item.name}</Heading>
+        {/* Use Chakra UI's Text component */}
+        <Text>
+          This sofa is perfect for modern tropical spaces, baroque inspired
+          spaces, earthy toned spaces and for people who love a chic design with
+          a sprinkle of vintage design.
+        </Text>
+      </Stack>
+      <Divider />
+      <Stack direction='row' spacing='2'></Stack>
+    </Stack>
   );
 };
 

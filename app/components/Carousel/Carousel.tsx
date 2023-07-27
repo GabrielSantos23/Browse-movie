@@ -56,7 +56,7 @@ const SwiperArrowRight: React.FC<SwiperArrowProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ children }) => {
   const swiperOptions = {
     slidesPerView: 7.15,
-    spaceBetween: 13,
+    spaceBetween: 20,
     initialSlide: 0,
     autoplay: false,
     loop: false,
@@ -91,9 +91,9 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
   };
 
   return (
-    <StyledSwiper {...swiperOptions}>
+    <StyledSwiper {...swiperOptions} className=''>
       {React.Children.map(children, (child) => (
-        <SwiperSlide key={child.key} className='card-home '>
+        <SwiperSlide key={child.key} className='card-home mt-5'>
           {child}
         </SwiperSlide>
       ))}

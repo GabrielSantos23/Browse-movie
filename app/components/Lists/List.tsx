@@ -26,7 +26,6 @@ const List: React.FC<ItemsCarouselProps> = ({
 }) => {
   const [items, setItems] = useState<any[]>([]);
   const { isLoading, setLoading } = useLoading();
-
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
