@@ -155,7 +155,6 @@ const PosterItem: React.FC<ItemProps> = ({
     }
     return '';
   };
-  console.log(item);
 
   return (
     <div className='flex flex-col'>

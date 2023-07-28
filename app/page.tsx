@@ -20,12 +20,12 @@ export default function Home() {
           type={'tv'}
           explore
         />
-        {/* <TrendList
+        <TrendList
           urltype='trending/all/week?'
           title='Top 10 For the Week'
           type={'movie'}
           explore
-        /> */}
+        />
       </div>
     </div>
   );
